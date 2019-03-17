@@ -1,11 +1,15 @@
 from django.contrib import admin
 from django.urls import path, include
+from . import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('blockchain/', include('blockchain.urls')),
+    path('', views.index),
+    path('blockchain/',  include('blockchain.urls')),
     path('transaction/', include('transaction.urls')),
+    path('mine/', include('mine.urls')),
 ]
+
 """admin URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
