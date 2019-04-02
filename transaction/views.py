@@ -1,10 +1,15 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from .models import Transaction
-from hashlib import sha256
+from django.views.decorators.csrf import csrf_protect,csrf_exempt
+import base64
 import datetime
 import json
-from django.views.decorators.csrf import csrf_protect,csrf_exempt
+from Crypto.PublicKey import RSA
+from Crypto.Hash import SHA256
+from Crypto.Signature import PKCS1_v1_5
+from hashlib import sha256
+
 
 #@csrf_protect
 def index(request):
@@ -37,6 +42,16 @@ def new(request):
         ts_signature= post_contents["signature"]
     except:
         return HttpResponse("someting wrong with json.loads(postBody)!")
+
+    hash_data = {'type':ts_type, 'contents':ts_contents, 'nonce':ts_nonce}
+    hash_json = json.dumps(hash_data, sort_keys=True)
+    pubKey = RSA.importKey(ts_pubkey)
+    hash_obj = SHA256.new(hash_json.encode());
+    verifier = PKCS1_v1_5.new(pubKey)
+    if not verifier.verify(hash_obj, base64.b64decode(ts_signature)):
+        #print("Check Signature failed!")
+        return HttpResponse("Check Signature failed!")
+
     try:
         now_timestamp = datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')
         new_transaction = Transaction.objects.create(type = ts_type ,timestamp = now_timestamp,

@@ -37,7 +37,7 @@ def create_block(transactions_json):
     Block.objects.create(id=this_block.index, timestamp=this_block.timestamp,
                   transactions = this_block.transactions, previous_hash = this_block.previous_hash,
                   nonce = this_block.nonce )
-    return str(this_block.nonce) + "  :  " + pre_block_hash + "  ------  " + this_hash
+    return str(this_block.nonce) + " , pre :  " + pre_block_hash + "  ------ this : " + this_hash
 def add_block():
     return 0
 def start(request):
